@@ -5,11 +5,6 @@ from typing import Callable
 
 RandVarFunct = Callable[[], float]
 
-# def uniform(a: float, b: float) -> float:
-#     return a + (b - a) * random()
-
-# def exponential(alpha: float) -> float:
-#     return - math.log(uniform(0, 1)) / alpha
 
 class Simulation:
     def __init__(
@@ -98,22 +93,18 @@ class Simulation:
 
 
 
-servers = [
-    lambda: np.random.uniform(),
-    lambda: np.random.exponential(0.2),
-    lambda: np.random.chisquare(0.1),
-    lambda: np.random.uniform(0.4),
-    lambda: np.random.exponential(0.5),
-]
-sim = Simulation(1440, 5, lambda: np.random.exponential(0.5), servers)
-times = sim.simulate()
 
-print('===========================')
-print(times)
-print('===========================')
 
-print(times[-1][-1])
-print(times[0][-1])
+
+def start_simulation(total_time:int,servers):
+    print('llamado una vez')
+    sim = Simulation(total_time, len(servers) ,lambda: np.random.exponential(0.5), servers)
+    times = sim.simulate()
+    print('===========================')
+    print(times)
+    print('===========================')
+    return times
+
 
     
     
