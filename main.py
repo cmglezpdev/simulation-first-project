@@ -49,23 +49,27 @@ class Simulation:
                 # if the server just has a client, generate the next arrival 
                 if clients_in_service[0] == 1:
                     t_events[0] = time + self._sim_services[0]()
-            
+
             # execute an change of server
             else:
                 time += t_events[curr_server]
                 clients_in_service[curr_server] -= 1
                 
+                # generate the next server swap
                 if clients_in_service[curr_server] > 0:
                     t_events[curr_server] = time + self._sim_services[curr_server]()
                 else:
                     t_events[curr_server] = math.inf
                     
+                # if a client get out of the system
                 if curr_server >= self._number_servers - 1:
                     number_departures += 1
                 else:
+                    # move the next server
                     clients_in_service[curr_server + 1] += 1
                     times_in_servers[curr_server + 1].append(time)
 
+                    # generate the next arrival
                     if clients_in_service[curr_server + 1] == 1:
                         t_events[curr_server + 1] = time + self._sim_services[curr_server + 1]()
 
