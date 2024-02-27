@@ -14,14 +14,6 @@ lambda: np.random.uniform(0.4),
 lambda: np.random.exponential(0.5),
 ]
 
-
-
-# Configuración de la página de Streamlit
-import streamlit as st
-import numpy as np
-import matplotlib.pyplot as plt
-
-
 datos_servidores = start_simulation(1800,servers)
 # Calcular estadísticas por servidor
 medias_servidores = [np.mean(servidor) for servidor in datos_servidores]
