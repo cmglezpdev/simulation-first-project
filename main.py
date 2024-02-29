@@ -22,7 +22,8 @@ class Simulation:
         number_arrivals = number_departures = 0
         times_in_servers  = [[] for _ in range(self._number_servers)] # Historical of times in each server
         clients_in_service = np.zeros(self._number_servers, dtype=int) # Number of clients in service by each server 
-        
+        times_during_servers = [[] for _ in range(self._number_servers)]
+
         next_arrival = time_arrival = self._sim_arrive()
         time = 0 # global time
         
@@ -35,7 +36,7 @@ class Simulation:
                 time += time_arrival
                 number_arrivals += 1
                 clients_in_service[0] += 1
-                times_in_servers[0].append(time)
+                times_during_servers[0].append(time)
                 
                 # generate the next arrival
                 next_arrival = self._sim_arrive()
@@ -43,7 +44,9 @@ class Simulation:
                 
                 # if the server just has a client, generate the next arrival 
                 if clients_in_service[0] == 1:
-                    t_events[0] = time + self._sim_services[0]()
+                    random_var = self._sim_services[0]()
+                    t_events[0] = time + random_var
+                    times_in_servers[0].append(random_var)
 
             # execute an change of server
             else:
@@ -52,7 +55,9 @@ class Simulation:
                 
                 # generate the next server swap
                 if clients_in_service[curr_server] > 0:
-                    t_events[curr_server] = time + self._sim_services[curr_server]()
+                    random_var = self._sim_services[curr_server]()
+                    t_events[curr_server] = time + random_var
+                    times_in_servers[curr_server].append(random_var)
                 else:
                     t_events[curr_server] = math.inf
                     
@@ -62,21 +67,24 @@ class Simulation:
                 else:
                     # move the next server
                     clients_in_service[curr_server + 1] += 1
-                    times_in_servers[curr_server + 1].append(time)
+                    times_during_servers[curr_server + 1].append(time)
 
                     # generate the next arrival
                     if clients_in_service[curr_server + 1] == 1:
-                        t_events[curr_server + 1] = time + self._sim_services[curr_server + 1]()
+                        random_var = self._sim_services[curr_server + 1]()
+                        t_events[curr_server + 1] = time + random_var
+                        times_in_servers[curr_server + 1].append(random_var)
 
-
+        print(number_arrivals)
         # Process the rest of clients
-        while number_arrivals < number_departures:
+        while number_arrivals > number_departures:
             curr_server = np.argmin(t_events)
             time += t_events[curr_server]
             clients_in_service[curr_server] -= 1
-            
-            if clients_in_service > 0:
-                t_events[curr_server] = time + self._sim_services[curr_server]()
+            if clients_in_service[curr_server] > 0:
+                random_var = self._sim_services[curr_server]()
+                t_events[curr_server] = time + random_var
+                times_in_servers[curr_server].append(random_var)
             else:
                 t_events[curr_server] = math.inf
                 
@@ -84,12 +92,14 @@ class Simulation:
                 number_departures += 1
             else:
                 clients_in_service[curr_server + 1] += 1
-                times_in_servers[curr_server + 1].append(time)
+                times_during_servers[curr_server + 1].append(time)
                 
                 if clients_in_service[curr_server + 1] == 1:
-                    t_events[curr_server + 1] = time + self._sim_services[curr_server + 1]()
+                    random_var = self._sim_services[curr_server + 1]()
+                    t_events[curr_server + 1] = time + random_var
+                    times_in_servers[curr_server + 1].append(random_var)
 
-        return times_in_servers 
+        return [times_in_servers , times_during_servers]
 
 
 
