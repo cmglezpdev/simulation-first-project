@@ -27,7 +27,7 @@ class Simulation:
         next_arrival = time_arrival = self._sim_arrive()
         time = 0 # global time
         
-        while time_arrival <= self._total_time:
+        while (time_arrival <= self._total_time or number_arrivals <= 10):
             curr_server = np.argmin(t_events) # server with the next event
 
             # if the next arrival comes before the others events 
